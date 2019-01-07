@@ -1,0 +1,173 @@
+﻿@model CheckoutModel
+@{
+    ViewData["Title"] = "Checkout";
+}
+@if (!this.ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in (this.ViewData.ModelState.Where(x => x.Value.Errors.Count > 0).Select(x => x.Value.Errors)))
+            {
+                @foreach (var message in error)
+                {
+                    <li>@message.ErrorMessage</li>
+                }
+            }
+        </ul>
+    </div>
+}
+
+<h2>Checkout</h2>
+<form method="post" class="checkout">
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <input type="email" asp-for="Email" required class="form-control" disabled />
+            <input type="hidden" asp-for="Email" />
+        }
+        else
+        {
+            <input type="email" asp-for="Email" required class="form-control" />
+        }
+    </div>
+    <div class="form-group">
+        <label asp-for="StreetAddress"></label>
+        <input type="text" asp-for="StreetAddress" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="City"></label>
+        <input type="text" asp-for="City" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="State"></label>
+        <input type="text" asp-for="State" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ZipCode"></label>
+        <input type="text" asp-for="ZipCode" class="form-control" />
+    </div>
+    <div class="form-group">
+        <button class="btn btn-secondary" id="validateAddress" disabled>Validate Address</button>
+    </div>
+    <div class="form-group">
+        <label for="card-number">Card Number</label>
+        <div id="card-number" class="form-control"></div>
+    </div>
+    <div class="form-group">
+        <label for="cvv">CVV</label>
+        <div id="cvv" class="form-control"></div>
+    </div>
+    <div class="form-group">
+        <label for="expiration-date">Expiration Date</label>
+        <div id="expiration-date" class="form-control"></div>
+    </div>
+
+    <input asp-for="Nonce" type="hidden" />
+    <input type="submit" class="btn btn-primary" disabled value="Submit Order" />
+</form>
+
+@section Scripts{
+    <script src="https://js.braintreegateway.com/web/3.35.0/js/client.min.js"></script>
+    <script src="https://js.braintreegateway.com/web/3.35.0/js/hosted-fields.min.js"></script>
+    <script>
+      var form = document.querySelector('form.checkout');
+      var submit = document.querySelector('input[type="submit"]');
+
+       braintree.client.create({
+        authorization: '@ViewBag.ClientAuthorization'
+      }, function (clientErr, clientInstance) {
+        if (clientErr) {
+          console.error(clientErr);
+          return;
+        }
+         
+         braintree.hostedFields.create({
+          client: clientInstance,
+          styles: {
+            'input': {
+              'font-size': '14px'
+            },
+            'input.invalid': {
+              'color': 'red'
+            },
+            'input.valid': {
+              'color': 'green'
+            }
+          },
+          fields: {
+            number: {
+              selector: '#card-number',
+              placeholder: '4111 1111 1111 1111'
+            },
+            cvv: {
+              selector: '#cvv',
+              placeholder: '123'
+            },
+            expirationDate: {
+              selector: '#expiration-date',
+              placeholder: '10/2019'
+              }
+          }
+        }, function (hostedFieldsErr, hostedFieldsInstance) {
+          if (hostedFieldsErr) {
+            console.error(hostedFieldsErr);
+            return;
+          }
+            submit.removeAttribute('disabled');
+
+           form.addEventListener('submit', function (event) {
+               event.preventDefault();
+
+             hostedFieldsInstance.tokenize(function (tokenizeErr, payload) {
+              if (tokenizeErr) {
+                console.error(tokenizeErr);
+                return;
+                }
+                document.querySelector("#Nonce").value = payload.nonce;
+                form.submit();
+            });
+          }, false);
+        });
+            });
+
+        $(document).ready(() => {
+            $('#validateAddress').click((e) => {
+                e.preventDefault();
+                var lookup = {
+                    Street: $("#StreetAddress").removeClass("is-valid").removeClass("is-invalid").val(),
+                    City: $("#City").removeClass("is-valid").removeClass("is-invalid").val(),
+                    State: $("#State").removeClass("is-valid").removeClass("is-invalid").val(),
+                    ZipCode: $("#ZipCode").removeClass("is-valid").removeClass("is-invalid").val()
+                };
+                $('#validateAddress').attr("disabled");
+
+                jQuery.ajax({
+                    url: "/checkout/validateaddress",
+                    type: "POST",
+                    data: JSON.stringify(lookup),
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8"
+                })
+                    .done((data, textStatus, jqXHR) => {
+                        console.log(data);
+                        $("#StreetAddress").addClass("is-valid").val(data.delivery_line_1);
+                        $("#City").addClass("is-valid").val(data.components.city_name);
+                        $("#State").addClass("is-valid").val(data.components.state_abbreviation);
+                        $("#ZipCode").addClass("is-valid").val(data.components.zipcode + "-" + data.components.plus4_code);
+                    })
+                    .fail((data, textStates, jqXHR) => {
+                        $("#StreetAddress").addClass("is-invalid");
+                        $("#City").addClass("is-invalid");
+                        $("#State").addClass("is-invalid");
+                        $("#ZipCode").addClass("is-invalid");
+                        console.log(data);
+                    })
+                    .always(() => {
+                        $('#validateAddress').removeAttr("disabled");
+                    });
+            }).removeAttr("disabled");
+
+        });
+    </script>
+}

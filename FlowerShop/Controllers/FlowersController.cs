@@ -28,11 +28,15 @@ namespace FlowerShop.Controllers
             if (await _context.FlowerProducts.CountAsync() == 0)
             {
                 List<FlowerProduct> flowers = new List<FlowerProduct>();
-                flowers.Add(new FlowerProduct { Name = "Roses", Description = "Red roses.", ImagePath = "./images/roses.png", Price = 20m, DateCreated = DateTime.Now, DateLastModified = DateTime.Now });
+                flowers.Add(new FlowerProduct { Name = "Roses", Description = "Red roses.", ImagePath = "./images/roses.jpeg", Price = 20m, DateCreated = DateTime.Now, DateLastModified = DateTime.Now });
+                flowers.Add(new FlowerProduct { Name = "Tulips", Description = "Pink tulips.", ImagePath = "./images/tulips.jpg", Price = 25m, DateCreated = DateTime.Now, DateLastModified = DateTime.Now });
+                flowers.Add(new FlowerProduct { Name = "Carnations", Description = "Assorted Carnations.", ImagePath = "./images/carnations.jpg", Price = 30m, DateCreated = DateTime.Now, DateLastModified = DateTime.Now });
                 _context.FlowerCategories.Add(new FlowerCategory { Name = "Flowers", FlowerProducts = flowers });
 
                 List<FlowerProduct> bouquets = new List<FlowerProduct>();
-                bouquets.Add(new FlowerProduct { Name = "Christmas Bouquet", ImagePath = "/images/cbouquet.png", Description = "A festive holiday bouquet.", Price = 40m, DateCreated = DateTime.Now, DateLastModified = DateTime.Now });
+                bouquets.Add(new FlowerProduct { Name = "Christmas Bouquet", ImagePath = "/images/winterb.jpg", Description = "A festive holiday bouquet.", Price = 50m, DateCreated = DateTime.Now, DateLastModified = DateTime.Now });
+                bouquets.Add(new FlowerProduct { Name = "Valentine Bouquet", ImagePath = "/images/valentine.jpg", Description = "A romantic bouquet for your Valentine.", Price = 60m, DateCreated = DateTime.Now, DateLastModified = DateTime.Now });
+                bouquets.Add(new FlowerProduct { Name = "Spring Bouquet", ImagePath = "/images/spring.jpg", Description = "Our seasonal spring bouquet.", Price = 50m, DateCreated = DateTime.Now, DateLastModified = DateTime.Now });
                 _context.FlowerCategories.Add(new FlowerCategory { Name = "Bouquets", FlowerProducts = bouquets });
 
                 await _context.SaveChangesAsync();

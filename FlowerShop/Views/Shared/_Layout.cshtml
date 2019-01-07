@@ -10,11 +10,11 @@
 
 </head>
 <body>
-    <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
+    <nav class="navbar navbar-expand-sm bg-light navbar-light fixed-top">
         <div class="container">
             <div class="navbar-header">
                 <a class="navbar-brand" href="#">
-                    <img src="~/images/linksprite.png" class="d-inline-block align-top" />
+                    @*<img src="" class="d-inline-block align-top" />*@
                 </a>
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -22,18 +22,18 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">The Game Vault</a>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Flower Shop</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="navbar-nav">
                     <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                     <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="About">About</a></li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Games</a>
+                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Flowers</a>
                         <div class=" dropdown-menu">
-                            <a class="dropdown-item" asp-area="" asp-controller="Games" asp-action="Index">All</a>
-                            <a class="dropdown-item" href="/Games?category=NES">NES</a>
-                            <a class="dropdown-item" href="/Games?category=SNES">SNES</a>
+                            <a class="dropdown-item" asp-area="" asp-controller="Flowers" asp-action="Index">All</a>
+                            <a class="dropdown-item" href="/Flowers?category=flowers">Flowers</a>
+                            <a class="dropdown-item" href="/Flowers?category=bouquets">Bouquets</a>
                         </div>
                     </li>
                     <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>

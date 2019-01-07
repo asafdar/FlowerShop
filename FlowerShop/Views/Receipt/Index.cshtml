@@ -1,0 +1,83 @@
+﻿@model FlowerShop.Models.FlowerOrder
+
+@{
+    ViewData["Title"] = "Order" + Model.ID;
+}
+
+<h2>Thanks for ordering!</h2>
+
+<div class="row">
+    <div class="col-6">
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Email)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Email)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.StreetAddress)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.StreetAddress)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.City)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.City)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.State)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.State)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.ZipCode)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.ZipCode)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.DateCreated)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.DateCreated)
+            </dd>
+        </dl>
+    </div>
+    <div class="col-6">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Unit Price</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in Model.FlowerOrderProducts)
+                {
+                    <tr>
+                        <td>@product.ProductName</td>
+                        <td>@product.ProductDescription</td>
+                        <td>@((product.ProductPrice ?? 0).ToString("c"))</td>
+                        <td>@product.Quantity</td>
+                        <td>@((product.Quantity * (product.ProductPrice ?? 0)).ToString("c"))</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="4">Total</th>
+                    <td>@(Model.FlowerOrderProducts.Sum(x => x.Quantity * (x.ProductPrice ?? 0)).ToString("c"))</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<div>
+</div>

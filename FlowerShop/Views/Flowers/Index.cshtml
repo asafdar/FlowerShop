@@ -1,0 +1,63 @@
+﻿@model IEnumerable<FlowerCategory>
+
+<h2>Flowers</h2>
+
+<form>
+    <select onchange="this.form.submit()" name="category">
+        <option value="">All Products</option>
+        @if (ViewData["Categories"] != null)
+        {
+            @foreach (string category in (IEnumerable<string>)ViewData["Categories"])
+            {
+                if (ViewBag.selectedCategory == category)
+                {
+                    <option selected value="@category">@category</option>
+                }
+                else
+                {
+                    <option value="@category">@category</option>
+                }
+
+
+            }
+
+        }
+    </select>
+</form>
+
+
+
+
+
+@foreach (var platform in Model)
+{
+    <div>
+        <div class="card-deck">
+            @foreach (var product in platform.FlowerProducts)
+            {
+
+                <div class="card">
+                    <div class="card-body">
+                        <img src="@product.ImagePath" alt="@product.Name" width="300" />
+                        <h5 class="card-text">@product.Name</h5>
+                        <p class="card-text">@product.Description</p>
+                        <p class="card-text">@(product.Price.HasValue ? product.Price.Value.ToString("c") : "No Price")</p>
+
+                        <form method="post">
+                            <input type="hidden" value="@product.ID" />
+                            <select name="quantity">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                            <button asp-controller="Flowers" asp-action="Details" asp-route-id="@product.ID" class="btn btn-primary">Add to Cart</button>
+                        </form>
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+}

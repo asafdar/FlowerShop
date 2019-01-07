@@ -17,7 +17,7 @@ namespace FlowerShop.Models
 
         public string ProductDescription { get; set; }
 
-        public decimal ProductPrice { get; set; }
+        public decimal? ProductPrice { get; set; }
 
         public int? ProductID { get; set; }
 

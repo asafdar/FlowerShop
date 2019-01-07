@@ -14,8 +14,4 @@
     <PackageReference Include="smartystreets-dotnet-sdk" Version="8.0.14" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Views\Account\" />
-  </ItemGroup>
-
 </Project>

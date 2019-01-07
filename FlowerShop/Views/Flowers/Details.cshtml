@@ -1,0 +1,18 @@
+﻿@model FlowerProduct
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>@Model.Name</h2>
+<img class="img-fluid" src="/@Model.ImagePath" />
+<form method="post">
+    <input type="hidden" value="@Model.ID" />
+    <select name="quantity">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select>
+    <button class="btn btn-primary">Add to Cart</button>
+</form>
