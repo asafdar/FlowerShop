@@ -95,29 +95,59 @@ namespace FlowerShop.Controllers
                 _context.FlowerOrders.Add(order);
                 _context.SaveChanges();
 
-                await _braintreeGateway.Transaction.SaleAsync(new TransactionRequest
+                //await _braintreeGateway.Transaction.SaleAsync(new TransactionRequest
+                //{
+                //    Amount = (decimal)order.FlowerOrderProducts.Sum(x => x.Quantity * x.ProductPrice),    //You can also do 1m here
+                //    CreditCard = new TransactionCreditCardRequest
+                //    {
+                //        CardholderName = "Test Cardholder",
+                //        CVV = "123",
+                //        ExpirationMonth = DateTime.Now.AddMonths(1).ToString("MM"),
+                //        ExpirationYear = DateTime.Now.AddMonths(1).ToString("yyyy"),
+                //        Number = "4111111111111111"
+                //    }
+                //});
+                Customer c = null;
+                var csr = new CustomerSearchRequest();
+                csr.Email.Is(model.Email);
+                var customerSearchResult = await _braintreeGateway.Customer.SearchAsync(csr);
+                if (customerSearchResult.Ids.Any())
                 {
-                    Amount = (decimal)order.FlowerOrderProducts.Sum(x => x.Quantity * x.ProductPrice),    //You can also do 1m here
-                    CreditCard = new TransactionCreditCardRequest
-                    {
-                        CardholderName = "Test Cardholder",
-                        CVV = "123",
-                        ExpirationMonth = DateTime.Now.AddMonths(1).ToString("MM"),
-                        ExpirationYear = DateTime.Now.AddMonths(1).ToString("yyyy"),
-                        Number = "4111111111111111"
-                    }
-                });
-
-                var result = await _braintreeGateway.Transaction.SaleAsync(new TransactionRequest
+                    c = customerSearchResult.FirstItem;
+                }
+                else
                 {
-                    Amount = (decimal)order.FlowerOrderProducts.Sum(x => x.Quantity * x.ProductPrice),    //You can also do 1m here
-                    PaymentMethodNonce = nonce
-                });
+                    var cusResult = await _braintreeGateway.Customer.CreateAsync(new CustomerRequest { Email = model.Email });
+                    c = cusResult.Target;
+                }
 
-                await _emailSender.SendEmailAsync(model.Email, "Your order " + order.ID, "Thanks for ordering!  You bought : " + String.Join(",", order.FlowerOrderProducts.Select(x => x.ProductName)));
 
-                //TODO: Save this information to the database so we can ship the order
-                return RedirectToAction("Index", "Receipt", new { id = order.ID });
+
+                var card = await _braintreeGateway.PaymentMethod.CreateAsync(new PaymentMethodRequest { PaymentMethodNonce = nonce, CustomerId = c.Id });
+                
+               
+                if (card.IsSuccess())
+                {
+                    
+                        var result = await _braintreeGateway.Transaction.SaleAsync(new TransactionRequest
+                        {
+                            Amount = (decimal)order.FlowerOrderProducts.Sum(x => x.Quantity * x.ProductPrice),
+                            PaymentMethodToken = card.Target.Token
+
+                        });
+
+                        await _emailSender.SendEmailAsync(model.Email, "Your order " + order.ID, "Thanks for ordering!  You bought : " + String.Join(",", order.FlowerOrderProducts.Select(x => x.ProductName)));
+
+                        //TODO: Save this information to the database so we can ship the order
+                        return RedirectToAction("Index", "Receipt", new { id = order.ID });
+                 
+                }
+                else
+                {
+                    ModelState.AddModelError("CreditCard", "Problem with credit card");
+                }
+
+
             }
             //TODO: we have an error!  Redisplay the form!
             return View();

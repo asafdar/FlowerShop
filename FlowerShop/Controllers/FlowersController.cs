@@ -108,7 +108,7 @@ namespace FlowerShop.Controllers
                 {
                     DateCreated = DateTime.Now,
                     DateLastModified = DateTime.Now,
-                    ID = id ?? 0,
+                    FlowerProductID = id ?? 0,
                     Quantity = 0
                 };
                 cart.FlowerCartProducts.Add(product);
